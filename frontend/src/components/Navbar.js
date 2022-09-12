@@ -5,6 +5,7 @@ import {
   Flex,
   Avatar,
   Link,
+  Image,
   Button,
   Menu,
   MenuButton,
@@ -41,8 +42,6 @@ function Navbar() {
     <>
       <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-          <Box>Logo</Box>
-
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={7}>
               <Button onClick={toggleColorMode}>
@@ -57,18 +56,12 @@ function Navbar() {
                   cursor={"pointer"}
                   minW={0}
                 >
-                  <Avatar
-                    size={"sm"}
-                    src={"https://avatars.dicebear.com/api/male/username.svg"}
-                  />
+                  <Avatar size={"sm"} />
                 </MenuButton>
                 <MenuList alignItems={"center"}>
                   <br />
                   <Center>
-                    <Avatar
-                      size={"2xl"}
-                      src={"https://avatars.dicebear.com/api/male/username.svg"}
-                    />
+                    <Avatar size={"2xl"} />
                   </Center>
                   <br />
                   <Center>
@@ -83,6 +76,16 @@ function Navbar() {
               </Menu>
             </Stack>
           </Flex>
+
+          <Image
+            boxSize="50px"
+            src={
+              colorMode == "light"
+                ? "https://i.ibb.co/WtSfVpz/quickchat-logo.png"
+                : "https://i.ibb.co/84XMhnD/quickchat-logo-dark.png"
+            }
+            alt="Quickchat Logo"
+          />
         </Flex>
       </Box>
     </>
