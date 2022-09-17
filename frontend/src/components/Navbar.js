@@ -20,33 +20,53 @@ import {
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
-const NavLink = ({ children }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={"md"}
-    _hover={{
-      textDecoration: "none",
-      bg: useColorModeValue("gray.200", "gray.700"),
-    }}
-    href={"#"}
-  >
-    {children}
-  </Link>
-);
-
 function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const NavLink = ({ children }) => (
+    <Link
+      px={2}
+      py={1}
+      rounded={"md"}
+      _hover={{
+        textDecoration: "none",
+        bg: useColorModeValue("gray.200", "gray.700"),
+      }}
+      href={"#"}
+    >
+      {children}
+    </Link>
+  );
+
+  const themeIcon = (
+    <Button
+      onClick={toggleColorMode}
+      bg={useColorModeValue("gray.100", "gray.900")}
+    >
+      {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+    </Button>
+  );
+
+  const quickchatLogo = (
+    <Image
+      boxSize="50px"
+      src={
+        colorMode === "light"
+          ? "https://i.ibb.co/WtSfVpz/quickchat-logo.png"
+          : "https://i.ibb.co/84XMhnD/quickchat-logo-dark.png"
+      }
+      alt="Quickchat Logo"
+    />
+  );
+
   return (
     <>
       <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Flex alignItems={"center"}>
             <Stack direction={"row"} spacing={7}>
-              <Button onClick={toggleColorMode}>
-                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              </Button>
+              {themeIcon}
 
               <Menu>
                 <MenuButton
@@ -77,15 +97,7 @@ function Navbar() {
             </Stack>
           </Flex>
 
-          <Image
-            boxSize="50px"
-            src={
-              colorMode == "light"
-                ? "https://i.ibb.co/WtSfVpz/quickchat-logo.png"
-                : "https://i.ibb.co/84XMhnD/quickchat-logo-dark.png"
-            }
-            alt="Quickchat Logo"
-          />
+          {quickchatLogo}
         </Flex>
       </Box>
     </>
