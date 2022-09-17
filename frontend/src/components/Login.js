@@ -21,7 +21,7 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const handleInputChange = (event) => {
-    switch (event.target.type) {
+    switch (event.target.name) {
       case "username":
         setUsername(event.target.value);
         break;
@@ -32,24 +32,22 @@ function Login() {
     }
   };
 
+  const inputPrompts = ["username", "password"].map((type) => (
+    <>
+      <FormLabel>{type.charAt(0).toUpperCase() + type.slice(1)}</FormLabel>
+      <Input
+        type={type}
+        name={type}
+        onChange={handleInputChange}
+        placeholder={`Enter your ${type}`}
+        value={type === "username" ? username : password}
+      />
+    </>
+  ));
+
   return (
     <div style={style}>
-      <FormControl isRequired>
-        <FormLabel>Username</FormLabel>
-        <Input
-          type="username"
-          value={username}
-          placeholder="Enter your username"
-          onChange={handleInputChange}
-        />
-        <FormLabel>Password</FormLabel>
-        <Input
-          type="password"
-          value={password}
-          placeholder="Enter your password"
-          onChange={handleInputChange}
-        />
-      </FormControl>
+      <FormControl isRequired>{inputPrompts}</FormControl>
     </div>
   );
 }
