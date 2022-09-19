@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Box,
   Input,
   Button,
   FormLabel,
@@ -7,8 +8,9 @@ import {
   FormErrorMessage,
   InputGroup,
   InputRightElement,
+  VStack,
 } from "@chakra-ui/react";
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { ViewIcon, ViewOffIcon, ArrowRightIcon } from "@chakra-ui/icons";
 
 function Login() {
   const style = {
@@ -36,18 +38,7 @@ function Login() {
     }
   };
 
-  const inputPrompts = ["username", "password"].map((type) => (
-    <>
-      <FormLabel>{type.charAt(0).toUpperCase() + type.slice(1)}</FormLabel>
-      <Input
-        type={type}
-        name={type}
-        onChange={handleInputChange}
-        placeholder={`Enter your ${type}`}
-        value={type === "username" ? username : password}
-      />
-    </>
-  ));
+  const inputPrompts = ["username", "password"].map((type) => <></>);
 
   const [isViewPassword, setViewPassword] = useState(false);
   const viewPassword = (
@@ -58,21 +49,38 @@ function Login() {
 
   return (
     <div style={style}>
-      <FormControl isRequired>
-        {inputPrompts[0]}
+      <VStack spacing="16px">
+        <FormControl isRequired>
+          <VStack align="stretch">
+            <FormLabel>Username</FormLabel>
+            <Input
+              type="username"
+              name="username"
+              value={username}
+              onChange={handleInputChange}
+              placeholder={"Enter your username"}
+            />
 
-        <FormLabel>Password</FormLabel>
-        <InputGroup>
-          <Input
-            type={isViewPassword ? "text" : "password"}
-            name="password"
-            onChange={handleInputChange}
-            placeholder={`Enter your password`}
-            value={password}
-          />
-          <InputRightElement children={viewPassword} />
-        </InputGroup>
-      </FormControl>
+            <FormLabel>Password</FormLabel>
+            <InputGroup>
+              <Input
+                name="password"
+                value={password}
+                onChange={handleInputChange}
+                placeholder={"Enter your password"}
+                type={isViewPassword ? "text" : "password"}
+              />
+              <InputRightElement children={viewPassword} />
+            </InputGroup>
+          </VStack>
+        </FormControl>
+
+        <Button w="100%">
+          <Box>
+            Login <ArrowRightIcon w="3" h="3" />
+          </Box>
+        </Button>
+      </VStack>
     </div>
   );
 }
