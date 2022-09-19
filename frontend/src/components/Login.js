@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import {
   Input,
+  Button,
   FormLabel,
   FormControl,
   FormErrorMessage,
+  InputGroup,
+  InputRightElement,
 } from "@chakra-ui/react";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 function Login() {
   const style = {
@@ -45,9 +49,30 @@ function Login() {
     </>
   ));
 
+  const [isViewPassword, setViewPassword] = useState(false);
+  const viewPassword = (
+    <Button onClick={() => setViewPassword(!isViewPassword)}>
+      {isViewPassword ? <ViewIcon /> : <ViewOffIcon />}
+    </Button>
+  );
+
   return (
     <div style={style}>
-      <FormControl isRequired>{inputPrompts}</FormControl>
+      <FormControl isRequired>
+        {inputPrompts[0]}
+
+        <FormLabel>Password</FormLabel>
+        <InputGroup>
+          <Input
+            type={isViewPassword ? "text" : "password"}
+            name="password"
+            onChange={handleInputChange}
+            placeholder={`Enter your password`}
+            value={password}
+          />
+          <InputRightElement children={viewPassword} />
+        </InputGroup>
+      </FormControl>
     </div>
   );
 }
