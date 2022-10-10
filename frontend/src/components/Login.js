@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Box,
+  Link,
   Input,
   Button,
   FormLabel,
@@ -75,11 +76,13 @@ function Login() {
           </VStack>
         </FormControl>
 
-        <Button w="100%">
-          <Box>
-            Login <ArrowRightIcon w="3" h="3" />
-          </Box>
-        </Button>
+        <Link>
+          <Button w="100%">
+            <Box>
+              Login <ArrowRightIcon w="3" h="3" />
+            </Box>
+          </Button>
+        </Link>
       </VStack>
     </div>
   );
