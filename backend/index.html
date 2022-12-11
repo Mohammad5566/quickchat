@@ -30,14 +30,14 @@
       form.addEventListener("submit", e => {
           e.preventDefault();
           if (input.value) {
-            socket.emit("chat message", input.value);
+            socket.emit("chat message", socket.id, input.value);
             input.value = "";
           }
       });
 
-      socket.on("chat message", msg => {
+      socket.on("chat message", (id, msg) => {
         var item = document.createElement("li");
-        item.textContent = msg;
+        item.textContent = `${id} wrote: ${msg}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
