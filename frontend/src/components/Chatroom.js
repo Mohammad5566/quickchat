@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
 import {
   Box,
@@ -33,14 +33,25 @@ function Chatroom() {
 
   let messageList = [];
   const [input, setInput] = useState("");
+  const [recieved, setRecieved] = useState("");
 
-  const socket = io.connect(`http://localhost:3001`);
-  const sendMessage = () => {
-    socket.emit("chat message", socket.id, "TEST MESSAGE");
+  const socket = useRef();
+
+  const handleClick = (event) => {
+    event.preventDefault();
+    socket.current.emit("chat message", socket.id, input);
+    setInput("");
   };
 
   useEffect(() => {
-    socket.on("chat message", (id, msg) => {
+    socket.current = io("http://localhost:4000");
+
+    socket.current.on("connection", () => {
+      console.log("connected to server from React!");
+    });
+
+    socket.current.on("chat message", (id, msg) => {
+      setRecieved(msg);
       var item = document.createElement("li");
       item.textContent = `${id} wrote: ${msg}`;
       messageList.appendChild(
@@ -50,15 +61,16 @@ function Chatroom() {
       );
       window.scrollTo(0, document.body.scrollHeight);
     });
-  }, [socket, messageList]);
+  }, [messageList]);
 
   return (
     <>
       {console.log(messageList)}
       <UnorderedList id="message-list">{messageList}</UnorderedList>
       <form id="form" action="">
-        <input id="input" autocomplete="off" />
-        <button onClick={sendMessage}>Send</button>
+        <input id="input" onChange={(event) => setInput(event.target.value)} />
+        <button onClick={handleClick}>Send</button>
+        {recieved}
       </form>
     </>
   );
