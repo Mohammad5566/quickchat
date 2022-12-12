@@ -1,18 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
+import { BiSend } from "react-icons/bi";
 import {
   Box,
   List,
+  Icon,
   Text,
+  Input,
   Avatar,
   VStack,
+  Button,
   HStack,
   ListItem,
+  InputGroup,
   ListIcon,
   OrderedList,
+  FormControl,
+  FormLabel,
+  InputRightAddon,
+  FormErrorMessage,
+  FormHelperText,
   UnorderedList,
   useColorModeValue,
+  InputLeftElement,
 } from "@chakra-ui/react";
+
+let socket = null;
 
 function Chatroom() {
   const userInfo = (
@@ -31,47 +44,66 @@ function Chatroom() {
     ></VStack>
   );
 
-  let messageList = [];
   const [input, setInput] = useState("");
   const [recieved, setRecieved] = useState("");
+  const [messageList, setMessageList] = useState([]);
 
-  const socket = useRef();
-
-  const handleClick = (event) => {
-    event.preventDefault();
-    socket.current.emit("chat message", socket.id, input);
-    setInput("");
-  };
+  //const socket = useRef();
 
   useEffect(() => {
-    socket.current = io("http://localhost:4000");
+    socket = io("http://localhost:4000");
 
-    socket.current.on("connection", () => {
+    socket.on("connection", () => {
       console.log("connected to server from React!");
     });
 
-    socket.current.on("chat message", (id, msg) => {
+    socket.on("chat message", (id, msg) => {
       setRecieved(msg);
-      var item = document.createElement("li");
-      item.textContent = `${id} wrote: ${msg}`;
-      messageList.appendChild(
-        <ListItem>
-          `${id} wrote: ${msg}`;
-        </ListItem>
-      );
+      setMessageList([
+        ...messageList,
+        <ListItem>{`${id} wrote: ${msg}`}</ListItem>,
+      ]);
+
       window.scrollTo(0, document.body.scrollHeight);
     });
-  }, [messageList]);
+  }, []);
+
+  const handleClick = (event) => {
+    event.preventDefault();
+    socket.emit("chat message", socket.id, input);
+    setMessageList([
+      ...messageList,
+      <ListItem>{`${socket.id} wrote: ${input}`}</ListItem>,
+    ]);
+    setInput("");
+  };
 
   return (
     <>
       {console.log(messageList)}
-      <UnorderedList id="message-list">{messageList}</UnorderedList>
-      <form id="form" action="">
-        <input id="input" onChange={(event) => setInput(event.target.value)} />
-        <button onClick={handleClick}>Send</button>
-        {recieved}
-      </form>
+      <UnorderedList listStyleType="none">{messageList}</UnorderedList>
+      <FormControl>
+        <InputGroup>
+          <InputLeftElement children={<Icon as={BiSend} />} />
+          <Input
+            value={input}
+            variant="filled"
+            autoComplete="off"
+            placeholder="Send a message"
+            onChange={(event) => setInput(event.target.value)}
+          />
+          <InputRightAddon
+            children={
+              <Button
+                onClick={handleClick}
+                bg={useColorModeValue("gray.200", "gray800")}
+              >
+                Send
+              </Button>
+            }
+          />
+        </InputGroup>
+      </FormControl>
     </>
   );
 }
