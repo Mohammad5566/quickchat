@@ -16,30 +16,46 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-io.use((socket, next) => {
-  const sessionID = socket.handshake.auth.sessionID;
-  if (sessionID) {
-    // find existing session
-    const session = sessionStore.findSession(sessionID);
-    if (session) {
-      socket.sessionID = sessionID;
-      socket.userID = session.userID;
-      socket.username = session.username;
-      return next();
-    }
-  }
-  const username = socket.handshake.auth.username;
-  if (!username) {
-    return next(new Error("invalid username"));
-  }
-  // if existing session not found, create new session
-  socket.sessionID = randomId();
-  socket.userID = randomId();
-  socket.username = username;
-  next();
-});
+// io.use((socket, next) => {
+//   const sessionID = socket.handshake.auth.sessionID;
+//   if (sessionID) {
+//     // find existing session
+//     const session = sessionStore.findSession(sessionID);
+//     if (session) {
+//       socket.sessionID = sessionID;
+//       socket.userID = session.userID;
+//       socket.username = session.username;
+//       return next();
+//     }
+//   }
+//   const username = socket.handshake.auth.username;
+//   if (!username) {
+//     return next(new Error("invalid username"));
+//   }
+//   // if existing session not found, create new session
+//   socket.sessionID = randomId();
+//   socket.userID = randomId();
+//   socket.username = username;
+//   next();
+// });
 
 io.on("connection", (socket) => {
+  // gather all connected users
+  const usersList = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    usersList.push({
+      userID: id,
+      username: socket.username,
+    });
+  }
+  socket.emit("users", usersList);
+
+  // notify existing users that others connected
+  socket.broadcast.emit("user connected", {
+    userID: socket.id,
+    username: socket.username,
+  });
+
   socket.emit("chat session", socket.sessionID, socket.userID);
 
   socket.join(socket.userID);
@@ -50,7 +66,6 @@ io.on("connection", (socket) => {
   });
 
   console.log(socket.id);
-
   socket.on("chat message", (id, msg) => {
     console.log(msg);
     io.emit("chat message", id, msg);

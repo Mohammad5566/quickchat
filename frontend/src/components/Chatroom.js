@@ -30,31 +30,26 @@ import {
 let socket = null;
 
 function Chatroom(isLoggedIn) {
-  // const userInfo = (
-  //   <HStack padding="2% 2% 2% 2%" justifyContent="start">
-  //     <Avatar size={"sm"} />
-  //     <Text>usernamegoeshere</Text>
-  //   </HStack>
-  // );
-
-  // const chatBox = (
-  //   <VStack
-  //     margin="10% 30% 10% 30%"
-  //     boxShadow="sm"
-  //     rounded="md"
-  //     bg={useColorModeValue("gray.100", "gray.900")}
-  //   ></VStack>
-  // );
-
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [recieved, setRecieved] = useState("");
   const [messageList, setMessageList] = useState([]);
 
-  //const socket = useRef();
+  const usersList = useRef([]);
 
   useEffect(() => {
-    socket = io("http://localhost:4000", { autoConnect: false });
+    socket = io("http://localhost:4000");
+
+    // socket.on("users", (users) => {
+    //   users.forEach((user) => {
+    //     user.self = user.userID === socket.id;
+    //   });
+    //   usersList.current = users;
+    // });
+
+    // socket.on("user connected", (user) => {
+    //   usersList.push(user);
+    // });
 
     socket.on("chat session", (sessionID, userID) => {
       socket.auth = { sessionID };
@@ -62,63 +57,53 @@ function Chatroom(isLoggedIn) {
       socket.userID = userID;
     });
 
-    socket.on("connection", () => {
-      console.log("connected to server from React!");
-    });
-
-    socket.on("chat message", (id, msg) => {
-      //setRecieved(msg);
-      // setMessageList([
-      //   ...messageList,
-      //   <ListItem>{`${id} wrote: ${msg}`}</ListItem>,
-      // ]);
-
-      if (id !== socket.id) {
+    socket.on("chat message", ({ id, msg, username }) => {
+      if (id !== socket.id && username !== localStorage.getItem(username)) {
         setMessages((currentMessages) => [
           ...currentMessages,
           {
             text: msg,
             id: id,
             sender: {
-              name: id,
+              name: username,
               uid: "reciever",
-              avatar: "https://i.ibb.co/WtSfVpz/quickchat-logo.png",
+              avatar: "https://i.ibb.co/84XMhnD/quickchat-logo-dark.png",
             },
           },
         ]);
       }
-
-      //window.scrollTo(0, document.body.scrollHeight);
     });
   }, []);
 
   const handleClick = (msg) => {
-    socket.emit("chat message", socket.id, msg);
-    setMessages([
-      ...messages,
+    socket.emit("chat message", {
+      id: socket.id,
+      msg: msg,
+      username: localStorage.getItem("username"),
+    });
+    setMessages((currentMessages) => [
+      ...currentMessages,
       {
         text: msg,
         id: socket.id,
         sender: {
-          name: socket.id,
+          name: localStorage.getItem("username"),
           uid: "user1",
-          avatar: "https://i.ibb.co/84XMhnD/quickchat-logo-dark.png",
+          avatar: "https://i.ibb.co/WtSfVpz/quickchat-logo.png",
         },
       },
     ]);
-
-    // setInput("");
   };
 
   const user = {
     uid: "user1",
   };
 
-  const sessionID = localStorage.getItem("sessionID");
-  if (sessionID) {
-    socket.auth = { sessionID };
-    socket.connect();
-  }
+  // const sessionID = localStorage.getItem("sessionID");
+  // if (sessionID) {
+  //   socket.auth = { sessionID };
+  //   socket.connect();
+  // }
 
   return (
     <>
