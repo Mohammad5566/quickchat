@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Chatroom from "./Chatroom";
 import {
   Box,
   Link,
@@ -47,43 +48,63 @@ function Login() {
     </Button>
   );
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const handleLogin = (event) => {
+    setIsLoggedIn(true);
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
+  };
+
   return (
-    <div style={style}>
-      <VStack spacing="16px">
-        <FormControl isRequired>
-          <VStack align="stretch">
-            <FormLabel>Username</FormLabel>
-            <Input
-              type="username"
-              name="username"
-              value={username}
-              onChange={handleInputChange}
-              placeholder={"Enter your username"}
-            />
+    <>
+      {isLoggedIn ? (
+        <Chatroom isLoggedIn={true} />
+      ) : (
+        <div style={style}>
+          <VStack spacing="16px">
+            <FormControl isRequired>
+              <VStack align="stretch">
+                <FormLabel>Username</FormLabel>
+                <Input
+                  type="username"
+                  name="username"
+                  value={username}
+                  autoComplete="off"
+                  onChange={handleInputChange}
+                  placeholder={"Enter your username"}
+                />
 
-            <FormLabel>Password</FormLabel>
-            <InputGroup>
-              <Input
-                name="password"
-                value={password}
-                onChange={handleInputChange}
-                placeholder={"Enter your password"}
-                type={isViewPassword ? "text" : "password"}
-              />
-              <InputRightElement children={viewPassword} />
-            </InputGroup>
+                <FormLabel>Password</FormLabel>
+                <InputGroup>
+                  <Input
+                    name="password"
+                    value={password}
+                    onChange={handleInputChange}
+                    autoComplete="off"
+                    placeholder={"Enter your password"}
+                    type={isViewPassword ? "text" : "password"}
+                  />
+                  <InputRightElement children={viewPassword} />
+                </InputGroup>
+              </VStack>
+            </FormControl>
+
+            <Link
+              href="/"
+              onClick={<Chatroom isLoggedIn={true} />}
+              textDecorationColor="green"
+              textDecorationLine="none"
+            >
+              <Button w="100%" onClick={handleLogin}>
+                <Box>
+                  Login <ArrowRightIcon w="2.5" h="2.5" />
+                </Box>
+              </Button>
+            </Link>
           </VStack>
-        </FormControl>
-
-        <Link>
-          <Button w="100%">
-            <Box>
-              Login <ArrowRightIcon w="3" h="3" />
-            </Box>
-          </Button>
-        </Link>
-      </VStack>
-    </div>
+        </div>
+      )}
+    </>
   );
 }
 

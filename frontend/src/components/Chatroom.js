@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "react-chatbox-component/dist/style.css";
 import { ChatBox } from "react-chatbox-component";
 import io from "socket.io-client";
-import { BiSend } from "react-icons/bi";
+import Login from "./Login";
 import {
   Box,
   List,
@@ -29,54 +29,24 @@ import {
 
 let socket = null;
 
-function Chatroom() {
-  // // old chatbox before i used new chat component
-  // const oldChatBox = (
-  //   <Box margin="10% 25% 10% 25%">
-  //     <UnorderedList listStyleType="none">{messageList}</UnorderedList>
-  //     <FormControl>
-  //       <InputGroup>
-  //         <InputLeftElement children={<Icon as={BiSend} />} />
-  //         <Input
-  //           value={input}
-  //           variant="filled"
-  //           autoComplete="off"
-  //           placeholder="Send a message"
-  //           onChange={(event) => setInput(event.target.value)}
-  //         />
-  //         <InputRightAddon
-  //           children={
-  //             <Button
-  //               onClick={handleClick}
-  //               bg={useColorModeValue("gray.200", "gray800")}
-  //             >
-  //               Send
-  //             </Button>
-  //           }
-  //         />
-  //       </InputGroup>
-  //     </FormControl>
-  //   </Box>
+function Chatroom(isLoggedIn) {
+  // const userInfo = (
+  //   <HStack padding="2% 2% 2% 2%" justifyContent="start">
+  //     <Avatar size={"sm"} />
+  //     <Text>usernamegoeshere</Text>
+  //   </HStack>
   // );
 
-  const userInfo = (
-    <HStack padding="2% 2% 2% 2%" justifyContent="start">
-      <Avatar size={"sm"} />
-      <Text>usernamegoeshere</Text>
-    </HStack>
-  );
-
-  const chatBox = (
-    <VStack
-      margin="10% 30% 10% 30%"
-      boxShadow="sm"
-      rounded="md"
-      bg={useColorModeValue("gray.100", "gray.900")}
-    ></VStack>
-  );
+  // const chatBox = (
+  //   <VStack
+  //     margin="10% 30% 10% 30%"
+  //     boxShadow="sm"
+  //     rounded="md"
+  //     bg={useColorModeValue("gray.100", "gray.900")}
+  //   ></VStack>
+  // );
 
   const [messages, setMessages] = useState([]);
-
   const [input, setInput] = useState("");
   const [recieved, setRecieved] = useState("");
   const [messageList, setMessageList] = useState([]);
@@ -84,11 +54,12 @@ function Chatroom() {
   //const socket = useRef();
 
   useEffect(() => {
-    socket = io("http://localhost:4000", {
-      extraHeaders: {
-        username: "test",
-        password: "test",
-      },
+    socket = io("http://localhost:4000", { autoConnect: false });
+
+    socket.on("chat session", (sessionID, userID) => {
+      socket.auth = { sessionID };
+      localStorage.setItem("sessionID", sessionID);
+      socket.userID = userID;
     });
 
     socket.on("connection", () => {
@@ -122,13 +93,7 @@ function Chatroom() {
   }, []);
 
   const handleClick = (msg) => {
-    //event.preventDefault();
     socket.emit("chat message", socket.id, msg);
-    // setMessageList([
-    //   ...messageList,
-    //   <ListItem>{`${socket.id} wrote: ${input}`}</ListItem>,
-    // ]);
-
     setMessages([
       ...messages,
       {
@@ -148,10 +113,21 @@ function Chatroom() {
   const user = {
     uid: "user1",
   };
+
+  const sessionID = localStorage.getItem("sessionID");
+  if (sessionID) {
+    socket.auth = { sessionID };
+    socket.connect();
+  }
+
   return (
     <>
       {console.log(messages)}
-      <ChatBox messages={messages} user={user} onSubmit={handleClick} />
+      {isLoggedIn ? (
+        <ChatBox messages={messages} user={user} onSubmit={handleClick} />
+      ) : (
+        <Login />
+      )}
     </>
   );
 }

@@ -8,8 +8,8 @@ function App() {
   return (
     <ChakraProvider>
       <Navbar />
-      {/* <Login /> */}
-      <Chatroom />
+      <Login />
+      {/* <Chatroom /> */}
     </ChakraProvider>
   );
 }

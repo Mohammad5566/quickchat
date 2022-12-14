@@ -17,18 +17,33 @@ app.get("/", (req, res) => {
 });
 
 io.use((socket, next) => {
-  username = socket.handshake.headers["username"];
-  password = socket.handshake.headers["password"];
-  if (username === "test" && password == "test") {
-    next();
-    console.log("Authenticated user");
-  } else {
-    next(new Error());
-    console.log("Failed to authenticate user");
+  const sessionID = socket.handshake.auth.sessionID;
+  if (sessionID) {
+    // find existing session
+    const session = sessionStore.findSession(sessionID);
+    if (session) {
+      socket.sessionID = sessionID;
+      socket.userID = session.userID;
+      socket.username = session.username;
+      return next();
+    }
   }
+  const username = socket.handshake.auth.username;
+  if (!username) {
+    return next(new Error("invalid username"));
+  }
+  // if existing session not found, create new session
+  socket.sessionID = randomId();
+  socket.userID = randomId();
+  socket.username = username;
+  next();
 });
 
 io.on("connection", (socket) => {
+  socket.emit("chat session", socket.sessionID, socket.userID);
+
+  socket.join(socket.userID);
+
   console.log("A user has connected");
   socket.on("disconnect", () => {
     console.log("this user disconnected");
