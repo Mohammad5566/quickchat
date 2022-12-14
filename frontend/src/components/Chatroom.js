@@ -84,7 +84,12 @@ function Chatroom() {
   //const socket = useRef();
 
   useEffect(() => {
-    socket = io("http://localhost:4000");
+    socket = io("http://localhost:4000", {
+      extraHeaders: {
+        username: "test",
+        password: "test",
+      },
+    });
 
     socket.on("connection", () => {
       console.log("connected to server from React!");
@@ -97,18 +102,20 @@ function Chatroom() {
       //   <ListItem>{`${id} wrote: ${msg}`}</ListItem>,
       // ]);
 
-      setMessages((currentMessages) => [
-        ...currentMessages,
-        {
-          text: msg,
-          id: id,
-          sender: {
-            name: id,
-            uid: "reciever",
-            avatar: "https://i.ibb.co/WtSfVpz/quickchat-logo.png",
+      if (id !== socket.id) {
+        setMessages((currentMessages) => [
+          ...currentMessages,
+          {
+            text: msg,
+            id: id,
+            sender: {
+              name: id,
+              uid: "reciever",
+              avatar: "https://i.ibb.co/WtSfVpz/quickchat-logo.png",
+            },
           },
-        },
-      ]);
+        ]);
+      }
 
       //window.scrollTo(0, document.body.scrollHeight);
     });
@@ -122,26 +129,29 @@ function Chatroom() {
     //   <ListItem>{`${socket.id} wrote: ${input}`}</ListItem>,
     // ]);
 
-    // setMessages([
-    //   ...messages,
-    //   {
-    //     text: msg,
-    //     id: socket.id,
-    //     sender: {
-    //       name: socket.id,
-    //       uid: "sender",
-    //       avatar: "https://i.ibb.co/84XMhnD/quickchat-logo-dark.png",
-    //     },
-    //   },
-    // ]);
+    setMessages([
+      ...messages,
+      {
+        text: msg,
+        id: socket.id,
+        sender: {
+          name: socket.id,
+          uid: "user1",
+          avatar: "https://i.ibb.co/84XMhnD/quickchat-logo-dark.png",
+        },
+      },
+    ]);
 
     // setInput("");
   };
 
+  const user = {
+    uid: "user1",
+  };
   return (
     <>
       {console.log(messages)}
-      <ChatBox messages={[...new Set(messages)]} onSubmit={handleClick} />
+      <ChatBox messages={messages} user={user} onSubmit={handleClick} />
     </>
   );
 }
