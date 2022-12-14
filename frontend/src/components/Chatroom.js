@@ -123,11 +123,7 @@ function Chatroom(isLoggedIn) {
   return (
     <>
       {console.log(messages)}
-      {isLoggedIn ? (
-        <ChatBox messages={messages} user={user} onSubmit={handleClick} />
-      ) : (
-        <Login />
-      )}
+      <ChatBox messages={messages} user={user} onSubmit={handleClick} />
     </>
   );
 }

@@ -48,7 +48,9 @@ function Login() {
     </Button>
   );
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("username") ? true : false
+  );
   const handleLogin = (event) => {
     setIsLoggedIn(true);
     localStorage.setItem("username", username);
@@ -89,18 +91,11 @@ function Login() {
               </VStack>
             </FormControl>
 
-            <Link
-              href="/"
-              onClick={<Chatroom isLoggedIn={true} />}
-              textDecorationColor="green"
-              textDecorationLine="none"
-            >
-              <Button w="100%" onClick={handleLogin}>
-                <Box>
-                  Login <ArrowRightIcon w="2.5" h="2.5" />
-                </Box>
-              </Button>
-            </Link>
+            <Button w="100%" onClick={handleLogin}>
+              <Box>
+                Login <ArrowRightIcon w="2.5" h="2.5" />
+              </Box>
+            </Button>
           </VStack>
         </div>
       )}
