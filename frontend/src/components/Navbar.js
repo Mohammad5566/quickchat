@@ -75,9 +75,7 @@ function Navbar() {
                   variant={"link"}
                   cursor={"pointer"}
                   minW={0}
-                >
-                  <Avatar size={"sm"} />
-                </MenuButton>
+                ></MenuButton>
                 <MenuList alignItems={"center"}>
                   <br />
                   <Center>
