@@ -30,7 +30,13 @@ import {
 let socket = null;
 
 function Chatroom(isLoggedIn) {
-  const [messages, setMessages] = useState([]);
+  let existingMsg = JSON.parse(localStorage.getItem("messages")) || [];
+  if (Object.keys(existingMsg).length === 0) {
+    existingMsg = [];
+    localStorage.setItem("messages", JSON.stringify([]));
+  }
+  const [messages, setMessages] = useState(existingMsg);
+
   const [input, setInput] = useState("");
   const [recieved, setRecieved] = useState("");
   const [messageList, setMessageList] = useState([]);
@@ -72,8 +78,13 @@ function Chatroom(isLoggedIn) {
           },
         ]);
       }
+      //localStorage.setItem("messages", JSON.stringify(messages));
     });
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("messages", JSON.stringify(messages));
+  }, [messages]);
 
   const handleClick = (msg) => {
     socket.emit("chat message", {
@@ -81,6 +92,7 @@ function Chatroom(isLoggedIn) {
       msg: msg,
       username: localStorage.getItem("username"),
     });
+
     setMessages((currentMessages) => [
       ...currentMessages,
       {
@@ -93,21 +105,17 @@ function Chatroom(isLoggedIn) {
         },
       },
     ]);
+
+    //localStorage.setItem("messages", JSON.stringify(messages));
   };
 
   const user = {
     uid: "user1",
   };
 
-  // const sessionID = localStorage.getItem("sessionID");
-  // if (sessionID) {
-  //   socket.auth = { sessionID };
-  //   socket.connect();
-  // }
-
   return (
     <>
-      {console.log(messages)}
+      {console.log(localStorage.getItem("messages"))}
       <ChatBox messages={messages} user={user} onSubmit={handleClick} />
     </>
   );
